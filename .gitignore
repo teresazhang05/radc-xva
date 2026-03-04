@@ -1,0 +1,25 @@
+# Build artifacts
+build/
+build_smoke/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.a
+*.o
+*.so
+*.dylib
+
+# Run outputs
+results/
+.mplcache/
+
+# Python caches
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# OS/editor files
+.DS_Store
+*.swp
+*.swo

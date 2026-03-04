@@ -1,0 +1,96 @@
+run:
+  run_id: test_stage3_intercept
+  seed: 777
+  output_dir: results/test_stage3_intercept
+  epochs: 2
+  warmup_epochs: 0
+  overwrite: true
+mpi:
+  comm: WORLD
+  barrier_before_epochs: true
+  barrier_after_epochs: true
+buffer:
+  N: 8
+  S: 8
+  layout: row_major
+  dtype_in: float64
+radc:
+  enabled: true
+  intercept: MPI_Allreduce
+  only_if_op: MPI_SUM
+  r_min: 1
+  r_max: 4
+  oversample_p: 2
+  power_iters: 1
+  omega_dist: rademacher
+  omega_seed: 4242
+  energy_capture: 0.9
+  factor_dtype: float32
+sketch:
+  kind: countsketch2d
+  kG: 8
+  kS: 8
+  num_sketches: 2
+  hash_seed_g0: 100
+  sign_seed_g0: 300
+  hash_seed_s0: 200
+  sign_seed_s0: 400
+  hash_seed_g1: 1100
+  sign_seed_g1: 1300
+  hash_seed_s1: 1200
+  sign_seed_s1: 1400
+risk:
+  kind: cva_like_scoped
+  netting_sets_G: 4
+  netting_seed: 202
+  collateral_kind: threshold
+  collateral_threshold: 0.0
+  a_scalar: 1.0
+  scenario_weights: uniform
+  notional_total: 1.0e8
+safety:
+  xva_epsilon_bps: 100.0
+  accept_margin: 0.95
+  jl_epsilon: 0.1
+  jl_delta: 1.0e-09
+detect:
+  enabled: false
+  delta_m_sigma_threshold: 6.0
+  force_fallback_if_r_hits_rmax: false
+fallback:
+  enabled: true
+  mode: collective_flag
+profiling:
+  timing_breakdown: true
+  perf_stat_enable: false
+  perf_events:
+  - cycles
+  - instructions
+  - cache-misses
+  - LLC-load-misses
+  rapl_enable: false
+logging:
+  per_rank_csv: metrics_rank{rank}.csv
+  per_rank_jsonl: events_rank{rank}.jsonl
+  flush_every_epochs: 1
+  shadow_exact_every: 1
+workload:
+  kind: synth_lowrank
+  synth_lowrank:
+    true_rank: 2
+    noise_scale: 0.01
+    heavy_tail: false
+  delta_gamma:
+    d_factors: 4
+    notional_min: 1.0e4
+    notional_max: 5.0e4
+    delta_scale: 0.5
+    gamma_scale: 0.1
+    scenario_sigma: 0.5
+    shock_sigma: 0.5
+    nonlinear_lambda: 0.01
+  pca_like:
+    true_rank: 2
+    noise_scale: 0.01
+compression:
+  double_mode: native64

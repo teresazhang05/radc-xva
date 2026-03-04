@@ -1,0 +1,98 @@
+run:
+  run_id: stage3_w2_normal_eval
+  seed: 223344
+  output_dir: results/stage3_w2_normal_eval
+  epochs: 80
+  warmup_epochs: 10
+  overwrite: true
+mpi:
+  comm: WORLD
+  barrier_before_epochs: true
+  barrier_after_epochs: true
+buffer:
+  N: 96
+  S: 160
+  layout: row_major
+  dtype_in: float64
+radc:
+  enabled: true
+  intercept: MPI_Allreduce
+  only_if_op: MPI_SUM
+  r_min: 2
+  r_max: 10
+  oversample_p: 4
+  power_iters: 1
+  omega_dist: rademacher
+  omega_seed: 424242
+  energy_capture: 0.995
+  factor_dtype: float32
+sketch:
+  kind: countsketch2d
+  kG: 48
+  kS: 48
+  num_sketches: 2
+  hash_seed_g0: 777
+  sign_seed_g0: 123
+  hash_seed_s0: 999
+  sign_seed_s0: 456
+  hash_seed_g1: 1777
+  sign_seed_g1: 1123
+  hash_seed_s1: 1999
+  sign_seed_s1: 1456
+risk:
+  kind: cva_like_scoped
+  netting_sets_G: 16
+  netting_seed: 202
+  collateral_kind: threshold
+  collateral_threshold: 0.0
+  a_scalar: 1.0
+  scenario_weights: uniform
+  notional_total: 1.0e10
+safety:
+  xva_epsilon_bps: 0.01
+  accept_margin: 0.95
+  jl_epsilon: 0.1
+  jl_delta: 1.0e-09
+detect:
+  enabled: false
+  delta_m_sigma_threshold: 6.0
+  force_fallback_if_r_hits_rmax: false
+fallback:
+  enabled: true
+  mode: collective_flag
+profiling:
+  timing_breakdown: true
+  perf_stat_enable: false
+  perf_events:
+  - cycles
+  - instructions
+  - cache-misses
+  - LLC-load-misses
+  rapl_enable: false
+logging:
+  per_rank_csv: metrics_rank{rank}.csv
+  per_rank_jsonl: events_rank{rank}.jsonl
+  flush_every_epochs: 1
+  shadow_exact_every: 10
+workload:
+  kind: delta_gamma
+  synth_lowrank:
+    true_rank: 8
+    noise_scale: 0.01
+    heavy_tail: false
+  delta_gamma:
+    d_factors: 4
+    notional_min: 7.5e3
+    notional_max: 3.75e4
+    delta_scale: 0.2
+    gamma_scale: 0.05
+    scenario_sigma: 0.25
+    shock_sigma: 0.25
+    nonlinear_lambda: 0.0
+  pca_like:
+    true_rank: 8
+    noise_scale: 0.05
+  common_scenarios_across_ranks: true
+  common_delta_m_across_ranks: true
+compression:
+  double_mode: native64
