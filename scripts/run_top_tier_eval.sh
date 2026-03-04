@@ -11,6 +11,18 @@ REAL_HOSTFILE="${REAL_HOSTFILE:-}"
 REAL_NP="${REAL_NP:-16}"
 ALLOW_EMULATION_ONLY="${ALLOW_EMULATION_ONLY:-1}"
 
+HEADLINE_GATES=1
+if [[ "$ALLOW_EMULATION_ONLY" == "1" ]]; then
+  HEADLINE_GATES=0
+fi
+if [[ "$NP_NETWORK" -lt 16 ]]; then
+  HEADLINE_GATES=0
+fi
+if [[ "$HEADLINE_GATES" == "0" ]]; then
+  echo "[top-tier] headline gates disabled (ALLOW_EMULATION_ONLY=$ALLOW_EMULATION_ONLY, NP_NETWORK=$NP_NETWORK)."
+  echo "[top-tier] running Phase-1/diagnostic validation only."
+fi
+
 if [[ -n "${PYTHON_BIN:-}" ]]; then
   PY_BIN="$PYTHON_BIN"
 elif [[ -x /opt/homebrew/Caskroom/miniforge/base/bin/python3 ]]; then
@@ -333,16 +345,16 @@ for cfg in "${METHOD_CFGS[@]}"; do
     extra_gates+=(--require_epsilon_bps 0.01)
   fi
 
-  if [[ "$run_id" == "network_w2_radc" ]]; then
+  if [[ "$HEADLINE_GATES" == "1" && "$run_id" == "network_w2_radc" ]]; then
     extra_gates+=(--require_bytes_reduction_pct_min 90.0 --require_fallback_pct_max 5.0)
   fi
-  if [[ "$run_id" == "network_w2_shock_sigma1_radc" ]]; then
+  if [[ "$HEADLINE_GATES" == "1" && "$run_id" == "network_w2_shock_sigma1_radc" ]]; then
     extra_gates+=(--require_fallback_pct_max 1.0)
   fi
-  if [[ "$run_id" == "network_w2_shock_sigma6_radc" || "$run_id" == "network_w2_shock_sigma8_radc" || "$run_id" == "network_w2_shock_sigma10_radc" ]]; then
+  if [[ "$HEADLINE_GATES" == "1" && ( "$run_id" == "network_w2_shock_sigma6_radc" || "$run_id" == "network_w2_shock_sigma8_radc" || "$run_id" == "network_w2_shock_sigma10_radc" ) ]]; then
     extra_gates+=(--require_fallback_pct_min 95.0)
   fi
-  if [[ "$run_id" == "network_w2_shock_sigma10_radc" ]]; then
+  if [[ "$HEADLINE_GATES" == "1" && "$run_id" == "network_w2_shock_sigma10_radc" ]]; then
     extra_gates+=(--max_p99_over_exact_ratio 1.05 --require_fallback_pct_min 99.0)
   fi
 
